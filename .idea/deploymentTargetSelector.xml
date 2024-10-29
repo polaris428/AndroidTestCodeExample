@@ -5,17 +5,6 @@
       <SelectionState runConfigName="app">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="addTodoItem_displaysInList()">
-        <option name="selectionMode" value="DROPDOWN" />
-        <DropdownSelection timestamp="2024-10-28T05:51:17.444841Z">
-          <Target type="DEFAULT_BOOT">
-            <handle>
-              <DeviceId pluginId="PhysicalDevice" identifier="serial=R3CW30S5Q9M" />
-            </handle>
-          </Target>
-        </DropdownSelection>
-        <DialogSelection />
-      </SelectionState>
       <SelectionState runConfigName="TodoListScreenTest">
         <option name="selectionMode" value="DROPDOWN" />
         <DropdownSelection timestamp="2024-10-28T16:02:11.602420700Z">
@@ -27,10 +16,21 @@
         </DropdownSelection>
         <DialogSelection />
       </SelectionState>
-      <SelectionState runConfigName="TodoListViewModelTest">
+      <SelectionState runConfigName="testRemoveTodoItem_removesFromListMulti()">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="removeTodoItem_itemRemovedSuccessfully()">
+      <SelectionState runConfigName="testAddEmptyTodoItem_doesNotDisplayInList()">
+        <option name="selectionMode" value="DROPDOWN" />
+        <DropdownSelection timestamp="2024-10-29T07:24:16.460300300Z">
+          <Target type="DEFAULT_BOOT">
+            <handle>
+              <DeviceId pluginId="PhysicalDevice" identifier="serial=R3CW30S5Q9M" />
+            </handle>
+          </Target>
+        </DropdownSelection>
+        <DialogSelection />
+      </SelectionState>
+      <SelectionState runConfigName="testAddEmptyTodoItem_doesNotDisplayInList2()">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
     </selectionStates>

@@ -8,58 +8,53 @@ import org.junit.Rule
 import org.junit.Test
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.devlog.androidtestcodeexample.data.model.repository.FakeTodoRepository
 import com.devlog.androidtestcodeexample.presentation.todo.TodoListViewModel
-import com.devlog.androidtestcodeexample.utile.getOrAwaitValue
-import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
-import junit.framework.Assert.assertTrue
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.runBlockingTest
 import org.junit.runner.RunWith
-import org.robolectric.RobolectricTestRunner
-import javax.inject.Inject
-import javax.inject.Named
+
 
 @HiltAndroidTest
-@ExperimentalCoroutinesApi
+@RunWith(AndroidJUnit4::class)
 class TodoListViewModelTest {
 
-    @get:Rule(order = 0)
-    val hiltRule = HiltAndroidRule(this)
+    @get:Rule
+    val instantExecutorRule = InstantTaskExecutorRule() // LiveData를 테스트할 때 필요
 
-    @get:Rule(order = 1)
-    val instantExecutorRule = InstantTaskExecutorRule()
+    private lateinit var viewModel: TodoListViewModel
 
-    // Hilt를 통해 주입된 ViewModel 및 Fake Repository
-    @Inject
-    lateinit var viewModel: TodoListViewModel
-
-    @Inject
-    @Named("fakeRepository")
-    lateinit var fakeRepository: FakeTodoRepository
-
+    private val fakeRepository = FakeTodoRepository()
     @Before
     fun setup() {
-        hiltRule.inject() // Hilt 주입 설정
+        viewModel = TodoListViewModel(fakeRepository)
     }
 
     @Test
-    fun addTodoItem_updatesTodoList() = runBlockingTest {
-        val newItem = TodoItem(id = 1, title = "Test Task")
-        viewModel.addTodoItem(newItem.title)
+    fun addTodoItem_itemAddedSuccessfully() {
+        // Given
 
-        // 예상대로 아이템이 추가되었는지 확인
-        assertEquals(listOf(newItem), viewModel.todoList.value)
+
+        // When
+        viewModel.addTodoItem("New Task")
+
+        // Then
+        val todoList = viewModel.todoList.value ?: emptyList()
+        assertEquals(1, todoList.size)
+        assertEquals("New Task", todoList[0].title)
     }
 
     @Test
-    fun removeTodoItem_updatesTodoList() = runBlockingTest {
-        val newItem = TodoItem(id = 0, title = "Test Task")
-        viewModel.addTodoItem(newItem.title)
-        viewModel.removeTodoItem(newItem)
+    fun removeTodoItem_itemRemovedSuccessfully() {
+        // Given
+        val item = TodoItem(id = 0, title = "New Task")
+        viewModel.addTodoItem("New Task")
 
-        // 예상대로 아이템이 삭제되었는지 확인
-        assertEquals(emptyList<TodoItem>(), viewModel.todoList.value)
+        // When
+        viewModel.removeTodoItem(item)
+
+        // Then
+        val todoList = viewModel.todoList.value ?: emptyList()
+        assertEquals(0, todoList.size)
     }
 }

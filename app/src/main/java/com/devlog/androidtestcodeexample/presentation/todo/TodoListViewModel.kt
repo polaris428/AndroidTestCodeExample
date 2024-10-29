@@ -25,11 +25,11 @@ class TodoListViewModel @Inject constructor(
     fun addTodoItem(title: String) {
         val newItem = TodoItem(id = _todoList.value?.size ?: 0, title = title)
         repository.addTodoItem(newItem)
-        _todoList.value = repository.getTodoItems()
+        _todoList.value = repository.getTodoItems().toList()
     }
 
     fun removeTodoItem(item: TodoItem) {
         repository.removeTodoItem(item)
-        _todoList.value = repository.getTodoItems()
+        _todoList.value = repository.getTodoItems().toList()
     }
 }

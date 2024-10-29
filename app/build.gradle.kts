@@ -18,11 +18,11 @@ android {
         versionCode = 1
         versionName = "1.0"
 
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
         vectorDrawables {
             useSupportLibrary = true
         }
-        testInstrumentationRunner ="com.devlog.androidtestcodeexample.CustomTestRunner"
+        testInstrumentationRunner  ="com.devlog.androidtestcodeexample.CustomTestRunner"
     }
 
     buildTypes {
@@ -73,6 +73,7 @@ dependencies {
     implementation(libs.testng)
     implementation(libs.androidx.ui.test.junit4.android)
 
+
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))
@@ -96,5 +97,5 @@ dependencies {
 
     implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.hilt.navigation.compose)
-    androidTestImplementation("androidx.arch.core:core-testing:2.1.0")
+
 }

@@ -1,64 +1,112 @@
 package com.devlog.androidtestcodeexample.todo
 
-import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.ui.test.junit4.createComposeRule
-import androidx.compose.ui.test.onNodeWithText
-import androidx.compose.ui.test.performClick
-import androidx.compose.ui.test.performTextInput
-import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.devlog.androidtestcodeexample.data.model.TodoItem
-import com.devlog.androidtestcodeexample.data.model.repository.FakeTodoRepository
-import com.devlog.androidtestcodeexample.presentation.todo.TodoListScreen
-import com.devlog.androidtestcodeexample.presentation.todo.TodoListViewModel
-import dagger.hilt.android.testing.HiltAndroidRule
-import dagger.hilt.android.testing.HiltAndroidTest
-import junit.framework.Assert.assertEquals
+
+import android.util.Log
+import androidx.compose.ui.test.hasContentDescription
+import androidx.compose.ui.test.hasText
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+
+
+import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.test.onAllNodesWithContentDescription
+import androidx.compose.ui.test.onAllNodesWithText
+import androidx.compose.ui.test.onNodeWithContentDescription
+import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performTextClearance
+import androidx.compose.ui.test.performTextInput
+import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.devlog.androidtestcodeexample.MainActivity
+
+import dagger.hilt.android.testing.HiltAndroidRule
+import dagger.hilt.android.testing.HiltAndroidTest
 import org.junit.runner.RunWith
 
 @HiltAndroidTest
 @RunWith(AndroidJUnit4::class)
-class TodoListViewModelTest {
+class TodoListScreenTest {
 
-    @get:Rule
-    val instantExecutorRule = InstantTaskExecutorRule() // LiveData를 테스트할 때 필요
+    @get:Rule(order = 0)
+    val hiltRule = HiltAndroidRule(this)
 
-    private lateinit var viewModel: TodoListViewModel
+    @get:Rule(order = 1)
+    val composeTestRule = createAndroidComposeRule<MainActivity>()
 
-    private val fakeRepository = FakeTodoRepository()
     @Before
     fun setup() {
-        viewModel = TodoListViewModel(fakeRepository)
+        hiltRule.inject()
     }
 
     @Test
-    fun addTodoItem_itemAddedSuccessfully() {
-        // Given
+    fun testAddTodoItem_displaysInList() {
+        composeTestRule.onNodeWithText("New Todo").performTextInput("Test Task")
+        composeTestRule.onNodeWithText("Add Todo").performClick()
 
-
-        // When
-        viewModel.addTodoItem("New Task")
-
-        // Then
-        val todoList = viewModel.todoList.value ?: emptyList()
-        assertEquals(1, todoList.size)
-        assertEquals("New Task", todoList[0].title)
+        // Verifying that "Test Task" appears in the list after adding
+        composeTestRule.onNodeWithText("Test Task").assertExists()
     }
 
     @Test
-    fun removeTodoItem_itemRemovedSuccessfully() {
-        // Given
-        val item = TodoItem(id = 0, title = "New Task")
-        viewModel.addTodoItem("New Task")
+    fun testRemoveTodoItem_removesFromList() {
+        composeTestRule.onNodeWithText("New Todo").performTextInput("Task to Remove")
+        composeTestRule.onNodeWithText("Add Todo").performClick()
 
-        // When
-        viewModel.removeTodoItem(item)
+        // Check if the item is added
+        composeTestRule.onNodeWithText("Task to Remove").assertExists()
 
-        // Then
-        val todoList = viewModel.todoList.value ?: emptyList()
-        assertEquals(0, todoList.size)
+        // Locate and click the delete icon associated with "Task to Remove"
+        composeTestRule.onNodeWithContentDescription("Delete").performClick()
+
+        // Verify the item is no longer in the list
+        composeTestRule.onNodeWithText("Task to Remove").assertDoesNotExist()
     }
+
+    @Test
+    fun testRemoveTodoItem_removesFromListMulti() {
+        for (i in 0..5){
+            composeTestRule.onNodeWithText("New Todo").performTextInput("Task to Remove")
+            composeTestRule.onNodeWithText("Add Todo").performClick()
+        }
+
+        for (j in 0..5){
+            composeTestRule.onAllNodesWithText("Task to Remove")[j].assertExists()
+        }
+
+        repeat(6) {
+            composeTestRule.onAllNodesWithContentDescription("Delete")[0].performClick()
+        }
+
+        composeTestRule.onNodeWithText("Task to Remove").assertDoesNotExist()
+        // Locate and click the delete icon associated with "Task to Remove"
+
+
+        // Verify the item is no longer in the list
+
+    }
+
+    @Test
+    fun testAddEmptyTodoItem_doesNotDisplayInList() {
+        // 현재 Todo 목록 항목 개수 확인
+        val initialItemCount = composeTestRule.onAllNodesWithText("Test Task").fetchSemanticsNodes().size
+        composeTestRule.onNodeWithText("Task to Remove").assertDoesNotExist()
+
+        // 빈 텍스트로 Todo 추가 시도
+        composeTestRule.onNodeWithText("New Todo").performTextInput("")
+        composeTestRule.onNodeWithText("Add Todo").performClick()
+
+        composeTestRule.onNodeWithText("New Todo").performTextInput("Test Task")
+        composeTestRule.onNodeWithText("Add Todo").performClick()
+        composeTestRule.onNodeWithText("Test Task").assertExists()
+        val finalItemCount =composeTestRule.onAllNodesWithText("Test Task").fetchSemanticsNodes().size
+        // Todo 항목 개수가 변경되지 않았는지 검증
+        assert(initialItemCount == finalItemCount) { "빈 항목이 추가되지 않아야 합니다." }
+
+        Log.e("polaris",initialItemCount.toString())
+        Log.e("polarisf", finalItemCount.toString())
+
+    }
+
+
 }
